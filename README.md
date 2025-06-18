@@ -8,7 +8,7 @@ DevConnect is a freelance platform that connects **developers** and **clients**.
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 DevConnect/
 ├── public/
@@ -25,7 +25,7 @@ DevConnect/
 ├── index.html
 └── README.md
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Clone the repository
 
@@ -42,7 +42,7 @@ bash
 Copy
 Edit
 npm run dev
-💻 Features
+##Features
 User authentication (developer/client roles)
 
 Job postings (by clients)
@@ -53,7 +53,7 @@ Tailwind-styled UI
 
 Responsive design
 
-🗃️ Database Schema
+## Database Schema
 Below is the ERD (Entity Relationship Diagram) representing the core database structure:
 
 🔗 Relationships
@@ -65,7 +65,7 @@ A User can have many Skills via the user_skills table
 
 A Skill can belong to many users
 
-📊 Diagram
+## Diagram
 plaintext
 Copy
 Edit
@@ -106,7 +106,7 @@ experience_level ('Beginner', 'Intermediate', 'Advanced')
 years_of_experience
 created_at
 (unique: user_id + skill_id)
-📦 Dependencies
+## Dependencies
 React
 
 Vite
@@ -117,7 +117,7 @@ PostCSS
 
 Autoprefixer
 
-📌 TODO
+##TODO
  Set up backend (Flask/Django/Node)
 
  JWT-based authentication
@@ -128,10 +128,10 @@ Autoprefixer
 
  Admin/moderation features
 
-📄 License
+##License
 This project is open-source and available under the MIT License.
 
-👨‍💻 Author
+##Author
 Meshack Gikonyo
 Graduate Software Engineer | Full-Stack Developer in training
 
