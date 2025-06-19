@@ -26,3 +26,13 @@ const Homepage = () => {
         status: 'open'
     }
 ]
+    return (
+        <div className="px- py-10 ma-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6">Welcome to Skillswap</h1>
+            <p className= "text=gray-600 mb-6">
+                 The platform where developers and clients connect to build amazing things.
+        </p>
+        
+        </div>
+        
+
