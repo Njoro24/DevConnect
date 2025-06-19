@@ -1,4 +1,4 @@
-//reusable component to display job preview card
+
 
 import React from 'react'
 
