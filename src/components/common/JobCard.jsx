@@ -13,7 +13,17 @@ const Jobcard = ({ title, budget, clientName, status}) => {
                 <strong>Client:</strong> {clientName} 
 
             </p>
-            
+            <p className="text-sm text-gray-600">
+                <strong>Budget:</strong> KES{budget}
+            </p>
+            {/* Status badge*/}
+            <span 
+            className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold 
+                 ${status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+      >
+        {status.toUpperCase()}
+      </span>
         </div>
     )
 }
+export default Jobcard
