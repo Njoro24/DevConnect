@@ -1,8 +1,9 @@
+import './index.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import JobDetailsPage from './pages/jobdetailspage';
 import JobListPage from './pages/jobspage';
 import NotFound from './pages/Notfound';
-import './App.css';
+
 
 // Mock job listings for the job list page
 const jobListings = [
