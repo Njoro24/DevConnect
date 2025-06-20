@@ -1,23 +1,12 @@
-dev
 // src/App.jsx
-import { Routes, Route } from 'react-router-dom'
-import LoginPage from './pages/loginpage'
-
-function App() {
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-    </Routes>
-  )
-=======
 import './index.css';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/loginpage';
 import JobDetailsPage from './pages/jobdetailspage';
 import JobListPage from './pages/jobspage';
 import NotFound from './pages/Notfound';
 
-
-// Mock job listings for the job list page
+// Mock job listings
 const jobListings = [
   {
     id: 'frontend-developer-tech-corp',
@@ -71,31 +60,16 @@ const jobListings = [
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* Default route - redirect to jobs list */}
-          <Route path="/" element={<Navigate to="/jobs" replace />} />
-          
-          {/* Jobs list page */}
-          <Route 
-            path="/jobs" 
-            element={<JobListPage jobs={jobListings} />} 
-          />
-          
-          {/* Job details page */}
-          <Route 
-            path="/jobs/:id" 
-            element={<JobDetailsPage />} 
-          />
-          
-          {/* 404 page */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </Router>
+    <div className="App">
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<Navigate to="/jobs" replace />} />
+        <Route path="/jobs" element={<JobListPage jobs={jobListings} />} />
+        <Route path="/jobs/:id" element={<JobDetailsPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   );
-main
 }
 
 export default App;
