@@ -21,16 +21,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const isAuthenticated = !!user && !!token; // Derived state
+  const isAuthenticated = !!user && !!token;
 
-  // Check auth status on mount
   useEffect(() => {
-    console.log('AuthProvider mounted');
     checkAuthStatus();
   }, []);
 
   const clearAuthData = () => {
-    console.log('Clearing auth data');
     setUser(null);
     setToken(null);
     localStorage.removeItem('devconnect_token');
@@ -39,17 +36,14 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      console.log('Checking auth status');
       const savedToken = localStorage.getItem('devconnect_token');
       const savedUser = localStorage.getItem('devconnect_user');
 
       if (!savedToken || !savedUser) {
-        console.log('No saved credentials found');
         clearAuthData();
         return;
       }
 
-      // Verify token with backend
       const response = await fetch('/api/verify-token', {
         method: 'GET',
         headers: {
@@ -59,11 +53,9 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.ok) {
-        console.log('Token verification successful');
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
       } else {
-        console.log('Token verification failed');
         clearAuthData();
       }
     } catch (error) {
@@ -76,7 +68,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData, userToken) => {
     try {
-      console.log('Login attempt for:', userData.email);
       setUser(userData);
       setToken(userToken);
       localStorage.setItem('devconnect_token', userToken);
@@ -90,17 +81,26 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      console.log('Registration attempt for:', formData.email);
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
-      
+      let data = {};
+      const rawText = await response.text();
+
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+      }
+
       if (!response.ok) {
-        return { success: false, error: data.message || 'Registration failed' };
+        return {
+          success: false,
+          error: data.message || 'Registration failed'
+        };
       }
 
       await login(data.user, data.token);
@@ -113,7 +113,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      console.log('Logout initiated');
       if (token) {
         await fetch('/api/logout', {
           method: 'POST',
@@ -131,7 +130,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUserData) => {
-    console.log('Updating user data');
     setUser(updatedUserData);
     localStorage.setItem('devconnect_user', JSON.stringify(updatedUserData));
   };
@@ -165,7 +163,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     isLoading,
-    isAuthenticated: isAuthenticated,
+    isAuthenticated,
     login,
     register,
     logout,
