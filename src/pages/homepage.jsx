@@ -3,7 +3,7 @@
 // how it works section, and featured jobs list.
 
 import React from 'react'
-import JobCard from '../components/JobCard'
+import JobCard from "../components/common/JobCard"
 import { Link } from 'react-router-dom'
 
 const HomePage = () => {
