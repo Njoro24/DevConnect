@@ -18,14 +18,32 @@ const LoginPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
-    if (!formData.password.trim()) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const newErrors = {};
+
+  // Email validation
+  if (!formData.email.trim()) {
+    newErrors.email = 'Email is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    newErrors.email = 'Please enter a valid email address';
+  }
+
+  // Password validation
+  if (!formData.password.trim()) {
+    newErrors.password = 'Password is required';
+  } else if (formData.password.length < 6) {
+    newErrors.password = 'Password must be at least 6 characters long';
+  } else if (!/[A-Z]/.test(formData.password)) {
+    newErrors.password = 'Password must contain at least one uppercase letter';
+  } else if (!/[a-z]/.test(formData.password)) {
+    newErrors.password = 'Password must contain at least one lowercase letter';
+  } else if (!/[0-9]/.test(formData.password)) {
+    newErrors.password = 'Password must contain at least one number';
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
