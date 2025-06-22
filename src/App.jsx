@@ -1,87 +1,114 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import JobDetailsPage from './pages/jobdetailspage';
-import JobListPage from './pages/jobspage';
-import NotFound from './pages/Notfound';
-import './App.css';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/Authcontext';
 
-// Mock job listings for the job list page
-const jobListings = [
-  {
-    id: 'frontend-developer-tech-corp',
-    title: 'Senior Frontend Developer',
-    company: 'TechCorp Solutions',
-    location: 'San Francisco, CA',
-    type: 'Full-time',
-    remote: true,
-    salary: '$120,000 - $160,000',
-    postedDate: '2024-01-15',
-    applicantCount: 47,
-    status: 'active',
-    priority: 'urgent',
-    companyLogo: 'https://via.placeholder.com/80x80/3B82F6/FFFFFF?text=TC',
-    tags: ['React', 'JavaScript', 'CSS', 'Node.js'],
-    description: 'We are seeking a passionate Senior Frontend Developer to join our innovative team...'
-  },
-  {
-    id: 'backend-engineer-data-systems',
-    title: 'Backend Engineer',
-    company: 'DataSystems Inc',
-    location: 'New York, NY',
-    type: 'Full-time',
-    remote: false,
-    salary: '$110,000 - $140,000',
-    postedDate: '2024-01-12',
-    applicantCount: 23,
-    status: 'active',
-    priority: 'normal',
-    companyLogo: 'https://via.placeholder.com/80x80/10B981/FFFFFF?text=DS',
-    tags: ['Python', 'Django', 'PostgreSQL', 'AWS'],
-    description: 'Join our backend team to build scalable data processing systems...'
-  },
-  {
-    id: 'ui-ux-designer-creative-labs',
-    title: 'UI/UX Designer',
-    company: 'Creative Labs',
-    location: 'Los Angeles, CA',
-    type: 'Contract',
-    remote: true,
-    salary: '$80,000 - $100,000',
-    postedDate: '2024-01-10',
-    applicantCount: 35,
-    status: 'closing-soon',
-    priority: 'normal',
-    companyLogo: 'https://via.placeholder.com/80x80/F59E0B/FFFFFF?text=CL',
-    tags: ['Figma', 'Sketch', 'Prototyping', 'User Research'],
-    description: 'Design beautiful and intuitive user experiences for our mobile and web applications...'
-  }
-];
+// Layout components
+import Layout from './components/layout/layout';
+import PrivateRoute from './components/common/PrivateRoute';
+
+// Page components
+import HomePage from './pages/homepage';
+import LoginPage from './pages/loginpage';
+import RegisterPage from './pages/registerpage';
+import ProfilePage from './pages/profilepage';
+import JobsPage from './pages/jobspage';
+import JobDetailsPage from './pages/jobdetailspage';
+
+// CSS
+import './App.css';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* Default route - redirect to jobs list */}
-          <Route path="/" element={<Navigate to="/jobs" replace />} />
-          
-          {/* Jobs list page */}
-          <Route 
-            path="/jobs" 
-            element={<JobListPage jobs={jobListings} />} 
-          />
-          
-          {/* Job details page */}
-          <Route 
-            path="/jobs/:id" 
-            element={<JobDetailsPage />} 
-          />
-          
-          {/* 404 page */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </Router>
+    <div className="App">
+      <Routes>
+        {/* Public Routes - these don't need authentication */}
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          } 
+        />
+        
+        {/* Protected Routes - these need authentication */}
+        <Route 
+          path="/" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <HomePage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/profile" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/jobs" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <JobsPage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/jobs/:id" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <JobDetailsPage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        {/* Catch all route - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
   );
 }
+
+// Public Route component - redirects to home if already logged in
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // If user is already authenticated, redirect to home
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 export default App;
