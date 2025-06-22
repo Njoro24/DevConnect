@@ -16,22 +16,14 @@ const RegisterPage = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Basic validation
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Name is required';
@@ -50,7 +42,6 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -71,25 +62,22 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-bold text-gray-900">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Join the DevConnect community
-        </p>
-      </div>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+      {/* Left Side: Form */}
+      <div className="flex items-center justify-center p-8 bg-gray-100">
+        <div className="w-full max-w-md">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+            <p className="mt-2 text-sm text-gray-600">Join the DevConnect community</p>
+          </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
           {errors.general && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-4">
+            <div className="bg-gray-200 border border-gray-300 text-gray-800 px-4 py-3 rounded-md text-sm mb-4 mt-6">
               {errors.general}
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6 mt-6" onSubmit={handleSubmit}>
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Name</label>
@@ -99,11 +87,11 @@ const RegisterPage = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.name ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  errors.name ? 'border-gray-400' : 'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm`}
                 placeholder="Your full name"
               />
-              {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-sm text-gray-600 mt-1">{errors.name}</p>}
             </div>
 
             {/* Email */}
@@ -115,11 +103,11 @@ const RegisterPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  errors.email ? 'border-gray-400' : 'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm`}
                 placeholder="Email address"
               />
-              {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-sm text-gray-600 mt-1">{errors.email}</p>}
             </div>
 
             {/* Password */}
@@ -131,13 +119,11 @@ const RegisterPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  errors.password ? 'border-gray-400' : 'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm`}
                 placeholder="********"
               />
-              {errors.password && (
-                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-sm text-gray-600 mt-1">{errors.password}</p>}
             </div>
 
             {/* Role */}
@@ -148,15 +134,14 @@ const RegisterPage = () => {
                 value={formData.role}
                 onChange={handleChange}
                 className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.role ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  errors.role ? 'border-gray-400' : 'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm`}
               >
                 <option value="">Select your role</option>
                 <option value="developer">Developer</option>
                 <option value="recruiter">Recruiter</option>
-                
               </select>
-              {errors.role && <p className="text-sm text-red-600 mt-1">{errors.role}</p>}
+              {errors.role && <p className="text-sm text-gray-600 mt-1">{errors.role}</p>}
             </div>
 
             {/* Bio */}
@@ -168,36 +153,45 @@ const RegisterPage = () => {
                 value={formData.bio}
                 onChange={handleChange}
                 className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.bio ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  errors.bio ? 'border-gray-400' : 'border-gray-300'
+                } rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm`}
                 placeholder="Tell us about yourself"
               ></textarea>
-              {errors.bio && <p className="text-sm text-red-600 mt-1">{errors.bio}</p>}
+              {errors.bio && <p className="text-sm text-gray-600 mt-1">{errors.bio}</p>}
             </div>
 
-            {/* Submit */}
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Registering...' : 'Create account'}
               </button>
             </div>
           </form>
 
-          {/* Link to login */}
+          {/* Login Link */}
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}
             <button
               onClick={() => navigate('/login')}
-              className="font-medium text-blue-600 hover:text-blue-500 underline"
+              className="font-medium text-gray-800 hover:text-gray-600 underline"
             >
               Sign in
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Right Side: Image */}
+      <div className="hidden md:block">
+        <img
+          src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Register visual"
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
   );
