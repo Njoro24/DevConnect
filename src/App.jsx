@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/Authcontext';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/Authcontext';
 
 // Layout components
 import Layout from './components/layout/layout';
@@ -19,79 +19,75 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            {/* Public Routes - these don't need authentication */}
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              } 
-            />
-            <Route 
-              path="/register" 
-              element={
-                <PublicRoute>
-                  <RegisterPage />
-                </PublicRoute>
-              } 
-            />
-            
-            {/* Protected Routes - these need authentication */}
-            <Route 
-              path="/" 
-              element={
-                <PrivateRoute>
-                  <Layout>
-                    <HomePage />
-                  </Layout>
-                </PrivateRoute>
-              } 
-            />
-            
-            <Route 
-              path="/profile" 
-              element={
-                <PrivateRoute>
-                  <Layout>
-                    <ProfilePage />
-                  </Layout>
-                </PrivateRoute>
-              } 
-            />
-            
-            <Route 
-              path="/jobs" 
-              element={
-                <PrivateRoute>
-                  <Layout>
-                    <JobsPage />
-                  </Layout>
-                </PrivateRoute>
-              } 
-            />
-            
-            <Route 
-              path="/jobs/:id" 
-              element={
-                <PrivateRoute>
-                  <Layout>
-                    <JobDetailsPage />
-                  </Layout>
-                </PrivateRoute>
-              } 
-            />
-            
-            {/* Catch all route - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </Router>
-    </AuthProvider>
+    <div className="App">
+      <Routes>
+        {/* Public Routes - these don't need authentication */}
+        <Route 
+          path="/login" 
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          } 
+        />
+        
+        {/* Protected Routes - these need authentication */}
+        <Route 
+          path="/" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <HomePage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/profile" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <ProfilePage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/jobs" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <JobsPage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/jobs/:id" 
+          element={
+            <PrivateRoute>
+              <Layout>
+                <JobDetailsPage />
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        {/* Catch all route - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
   );
 }
 

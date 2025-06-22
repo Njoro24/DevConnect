@@ -6,17 +6,17 @@ const Navbar = () => {
   const { isAuthenticated, logout, getUserName } = useAuth();
 
   return (
-    <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50 rounded-b-2xl border-b-2 border-blue-100">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
+              width="42"
+              height="42"
               viewBox="0 0 48 48"
-              className="text-blue-600"
+              className="text-blue-700"
             >
               <path
                 fill="currentColor"
@@ -25,34 +25,31 @@ const Navbar = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-xl font-bold text-blue-600">DevConnect</span>
+            <span className="text-2xl font-extrabold text-blue-700 tracking-wide">
+              DevConnect
+            </span>
           </Link>
 
           {/* Links */}
-          <div className="flex items-center space-x-6 text-sm font-medium">
+          <div className="hidden md:flex items-center space-x-8 text-base font-medium">
             {isAuthenticated ? (
               <>
-                <Link to="/profile" className="text-gray-700 hover:text-blue-600 transition">
-                  {getUserName()}
-                </Link>
-                <Link to="/jobs" className="text-gray-700 hover:text-blue-600 transition">
-                  Jobs
-                </Link>
+                <Link to="/jobs" className="nav-link">Jobs</Link>
+                <Link to="/jobdetails" className="nav-link">Job Details</Link>
+                <span className="text-gray-800 font-semibold">{getUserName()}</span>
                 <button
                   onClick={logout}
-                  className="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-md transition"
+                  className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
                 >
                   Sign out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-700 hover:text-blue-600 transition">
-                  Login
-                </Link>
+                <Link to="/login" className="nav-link">Login</Link>
                 <Link
                   to="/register"
-                  className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition"
+                  className="bg-blue-700 text-white px-4 py-2 rounded-full hover:bg-blue-800 transition"
                 >
                   Register
                 </Link>
@@ -61,6 +58,40 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Hover underline styling */}
+      <style>
+        {`
+          .nav-link {
+            position: relative;
+            color: #1f2937; /* text-gray-800 */
+            padding: 6px 12px;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+          }
+
+          .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 3px;
+            left: 12%;
+            bottom: -3px;
+            background-color: #1d4ed8; /* blue-700 */
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+          }
+
+          .nav-link:hover {
+            background-color: #e0f2fe;
+            color: #1d4ed8;
+          }
+
+          .nav-link:hover::after {
+            width: 75%;
+          }
+        `}
+      </style>
     </nav>
   );
 };
