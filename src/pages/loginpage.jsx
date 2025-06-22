@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ import useNavigate
+import { useNavigate } from 'react-router-dom'; //  import useNavigate
 import { useAuth } from '../context/Authcontext';
 
 const LoginPage = () => {
-  const navigate = useNavigate(); // ✅ initialize navigation hook
+  const navigate = useNavigate(); //  initialize navigation hook
 
   const [formData, setFormData] = useState({
     email: '',
@@ -72,7 +72,7 @@ const LoginPage = () => {
   };
 
   const handleRegisterClick = () => {
-    navigate('/register'); // ✅ navigate to register page
+    navigate('/register'); //  navigate to register page
   };
 
   return (
