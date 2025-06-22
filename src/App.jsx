@@ -7,14 +7,19 @@ import { useAuth } from './context/Authcontext';
 // Layout components
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
-import PublicRoute from './components/common/Publicroute';
+
+// Create PublicRoute component for routes that should only be accessible when not authenticated
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? children : <Navigate to="/" replace />;
+};
 
 // Page components
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
 import RegisterPage from './pages/registerpage';
 import ProfilePage from './pages/profilepage';
-import JobsPage from './pages/joblistingpage';
+import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
