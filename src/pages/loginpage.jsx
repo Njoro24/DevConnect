@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; //  import useNavigate
 import { useAuth } from '../context/Authcontext';
 
 const LoginPage = () => {
-  const navigate = useNavigate(); //  initialize navigation hook
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: '',
