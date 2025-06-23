@@ -1,4 +1,23 @@
-
+/* src/App.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+* Optional: Add minimal global base styles here if they are truly needed
+* and not handled by Tailwind classes.
+* Example: Ensures full height for the root React container.
+*/
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+* Optional: Set the Inter font globally if you've already ensured it's loaded
+* (e.g., via a <link> tag in index.html). Otherwise, use Tailwind's `font-inter` class.
+*/
+body {
+  font-family: 'Inter', sans-serif;
+}
