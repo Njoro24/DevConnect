@@ -52,6 +52,18 @@ function App() {
             element={
               <PrivateRoute>
                 <HomePage />
+feature/profile-footer
+              </Layout>
+            </PrivateRoute>
+          } 
+        />
+        
+        <Route 
+          path="/profile/:userId" 
+          element={
+            <PrivateRoute>
+              <Layout>
+
               </PrivateRoute>
             }
           />
@@ -59,6 +71,7 @@ function App() {
             path="/profile"
             element={
               <PrivateRoute>
+
                 <ProfilePage />
               </PrivateRoute>
             }
