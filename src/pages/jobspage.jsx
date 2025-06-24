@@ -16,6 +16,8 @@ import {
   CheckCircle
 } from 'lucide-react';
 import defaultJobs from '../data/samplejobs';
+import SkillTag from '../components/common/skillcard';
+import Pagination from '../components/Ui/pagination';
 
 const JobsPage = ({ jobs = defaultJobs }) => {
   const navigate = useNavigate();
@@ -24,12 +26,14 @@ const JobsPage = ({ jobs = defaultJobs }) => {
   const [typeFilter, setTypeFilter] = useState('');
   const [remoteFilter, setRemoteFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 5;
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = !searchTerm || 
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      job.tags?.some(tag => tag.skill.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesLocation = !locationFilter || 
       job.location.toLowerCase().includes(locationFilter.toLowerCase());
@@ -42,6 +46,10 @@ const JobsPage = ({ jobs = defaultJobs }) => {
 
     return matchesSearch && matchesLocation && matchesType && matchesRemote;
   });
+
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
 
   const getStatusBadge = (status, priority) => {
     const baseClasses = "px-3 py-1 rounded-full text-xs font-semibold transition-all";
@@ -84,6 +92,11 @@ const JobsPage = ({ jobs = defaultJobs }) => {
     setTypeFilter('');
     setRemoteFilter('');
     toast.info('Filters cleared!', { autoClose: 2000 });
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -194,8 +207,8 @@ const JobsPage = ({ jobs = defaultJobs }) => {
 
         {/* Job Cards */}
         <div className="space-y-6">
-          {filteredJobs.length > 0 ? (
-            filteredJobs.map((job) => (
+          {currentJobs.length > 0 ? (
+            currentJobs.map((job) => (
               <div
                 key={job.id}
                 onClick={() => handleJobClick(job)}
@@ -230,9 +243,7 @@ const JobsPage = ({ jobs = defaultJobs }) => {
 
                       <div className="flex flex-wrap gap-2 mb-4">
                         {job.tags?.slice(0, 4).map((tag, index) => (
-                          <span key={index} className="px-2 py-1 bg-gray-700 text-gray-200 rounded-full text-sm hover:bg-gray-600 transition duration-200">
-                            {tag}
-                          </span>
+                          <SkillTag key={index} skill={tag.skill} experience={tag.experience} />
                         ))}
                         {job.tags?.length > 4 && (
                           <span className="px-2 py-1 bg-gray-700 text-gray-500 rounded-full text-sm">+{job.tags.length - 4} more</span>
@@ -288,6 +299,11 @@ const JobsPage = ({ jobs = defaultJobs }) => {
             </div>
           )}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(filteredJobs.length / jobsPerPage)}
+          onPageChange={handlePageChange}
+        />
       </main>
 
       <ToastContainer
