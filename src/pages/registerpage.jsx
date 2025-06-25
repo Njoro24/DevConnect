@@ -48,7 +48,7 @@ const RegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const result = await register(formData);
+      const result = await register(formData); // This will use /api/auth/register internally
       if (result.success) {
         navigate('/');
       } else {

@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       try {
         data = rawText ? JSON.parse(rawText) : {};
       } catch (e) {
-        console.error('Failed to parse JSON response:', e);
+        console.error('Failed to parse JSON response:', e, rawText);
       }
 
       if (!response.ok) {
@@ -103,8 +103,16 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      await login(data.user, data.token);
-      return { success: true, data };
+      const token = data.access_token || data.token;
+      if (!token) {
+        return {
+          success: false,
+          error: 'Token missing in response'
+        };
+      }
+
+      await login(data.user, token);
+      return { success: true };
     } catch (error) {
       console.error('Registration error:', error);
       return { success: false, error: 'Network error' };
@@ -135,10 +143,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getAuthHeaders = () => {
-    return token ? {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    } : { 'Content-Type': 'application/json' };
+    return token
+      ? {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      : { 'Content-Type': 'application/json' };
   };
 
   const apiCall = async (url, options = {}) => {
@@ -159,22 +169,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const contextValue = useMemo(() => ({
-    user,
-    token,
-    isLoading,
-    isAuthenticated,
-    login,
-    register,
-    logout,
-    updateUser,
-    checkAuthStatus,
-    getAuthHeaders,
-    apiCall,
-    getUserRole: () => user?.role || null,
-    getUserId: () => user?.id || null,
-    getUserName: () => user?.name || user?.email || 'User'
-  }), [user, token, isLoading, isAuthenticated]);
+  const contextValue = useMemo(
+    () => ({
+      user,
+      token,
+      isLoading,
+      isAuthenticated,
+      login,
+      register,
+      logout,
+      updateUser,
+      checkAuthStatus,
+      getAuthHeaders,
+      apiCall,
+      getUserRole: () => user?.role || null,
+      getUserId: () => user?.id || null,
+      getUserName: () => user?.name || user?.email || 'User'
+    }),
+    [user, token, isLoading, isAuthenticated]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>
