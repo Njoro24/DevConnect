@@ -1,6 +1,13 @@
+// src/api.js
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5173/api';
+const API_BASE_URL = import.meta.env.DEV
+  ? '/api'
+  : import.meta.env.VITE_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('API base URL is not defined. Check your .env file.');
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +16,7 @@ const api = axios.create({
   },
 });
 
+// Attach JWT token automatically to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -17,6 +25,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Jobs API
 export const jobAPI = {
   getAllJobs: () => api.get('/jobs'),
   getJobById: (id) => api.get(`/jobs/${id}`),
@@ -25,21 +34,14 @@ export const jobAPI = {
   deleteJob: (id) => api.delete(`/jobs/${id}`),
 };
 
+// Auth API
 export const authAPI = {
-  login: async (credentials) => {
-    const response = await api.post('/login', credentials);
-    return response.data; 
-  },
-  register: async (userData) => {
-    const response = await api.post('/register', userData);
-    return response.data; 
-  },
-  getProfile: async (userId) => {
-    const response = await api.get(`/profile/${userId}`);
-    return response.data; 
-  },
+  login: (credentials) => api.post('/login', credentials).then(res => res.data),
+  register: (userData) => api.post('/register', userData).then(res => res.data),
+  getProfile: (userId) => api.get(`/profile/${userId}`).then(res => res.data),
 };
 
+// User API
 export const userAPI = {
   getAllUsers: () => api.get('/users'),
   getUserById: (id) => api.get(`/users/${id}`),
