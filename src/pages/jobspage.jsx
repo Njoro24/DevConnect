@@ -1,8 +1,9 @@
 import '../index.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { jobAPI } from '../services/api';
 import { 
   Search, 
   MapPin, 
@@ -17,22 +18,48 @@ import {
 } from 'lucide-react';
 import defaultJobs from '../data/samplejobs';
 
-const JobsPage = ({ jobs = defaultJobs }) => {
+const JobsPage = () => {
   const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [remoteFilter, setRemoteFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Fetch jobs from backend when component mounts
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await jobAPI.getAllJobs();
+      setJobs(response.data);
+      toast.success('Jobs loaded successfully!', { autoClose: 2000 });
+    } catch (err) {
+      console.error('Error fetching jobs:', err);
+      setError('Failed to load jobs from server');
+      // Fallback to default jobs if backend fails
+      setJobs(defaultJobs);
+      toast.error('Failed to load jobs from server. Showing sample data.', { autoClose: 3000 });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = !searchTerm || 
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesLocation = !locationFilter || 
-      job.location.toLowerCase().includes(locationFilter.toLowerCase());
+      job.location?.toLowerCase().includes(locationFilter.toLowerCase());
     
     const matchesType = !typeFilter || job.type === typeFilter;
     
@@ -74,8 +101,14 @@ const JobsPage = ({ jobs = defaultJobs }) => {
     navigate(`/jobs/${job.id}`, { state: { job } });
   };
 
-  const handleApply = (job) => {
-    toast.success(`Applied to ${job.title} successfully!`, { autoClose: 3000 });
+  const handleApply = async (job) => {
+    try {
+      // You can add API call here for job application
+      // await jobAPI.applyToJob(job.id);
+      toast.success(`Applied to ${job.title} successfully!`, { autoClose: 3000 });
+    } catch (err) {
+      toast.error('Failed to apply to job. Please try again.', { autoClose: 3000 });
+    }
   };
 
   const clearFilters = () => {
@@ -86,8 +119,34 @@ const JobsPage = ({ jobs = defaultJobs }) => {
     toast.info('Filters cleared!', { autoClose: 2000 });
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-purple-800 to-purple-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto mb-4"></div>
+          <h2 className="text-2xl font-semibold">Loading Jobs...</h2>
+          <p className="text-gray-300">Please wait while we fetch the latest opportunities</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-800 to-purple-900 text-white relative overflow-hidden">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-600 text-white p-3 text-center">
+          <span>{error}</span>
+          <button 
+            onClick={fetchJobs}
+            className="ml-4 px-3 py-1 bg-red-700 rounded hover:bg-red-800 transition duration-200"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-gray-800 bg-opacity-80 backdrop-blur-md shadow-lg border-b border-gray-700">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -165,8 +224,8 @@ const JobsPage = ({ jobs = defaultJobs }) => {
       <section className="max-w-7xl mx-auto py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center bg-gray-800 bg-opacity-80 backdrop-blur-md rounded-lg p-6 shadow-lg">
           <div className="p-4">
-            <h3 className="text-3xl font-bold text-blue-400">{123012}</h3>
-            <p className="text-gray-400">Jobs Added</p>
+            <h3 className="text-3xl font-bold text-blue-400">{jobs.length}</h3>
+            <p className="text-gray-400">Jobs Available</p>
           </div>
           <div className="p-4">
             <h3 className="text-3xl font-bold text-purple-400">{187432}</h3>
@@ -185,11 +244,19 @@ const JobsPage = ({ jobs = defaultJobs }) => {
           <h2 className="text-2xl font-semibold text-white">
             {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
           </h2>
-          <select className="px-4 py-2 border border-gray-700 rounded-full bg-gray-900 text-white">
-            <option>Most Relevant</option>
-            <option>Most Recent</option>
-            <option>Salary: High to Low</option>
-          </select>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={fetchJobs}
+              className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300"
+            >
+              Refresh
+            </button>
+            <select className="px-4 py-2 border border-gray-700 rounded-full bg-gray-900 text-white">
+              <option>Most Relevant</option>
+              <option>Most Recent</option>
+              <option>Salary: High to Low</option>
+            </select>
+          </div>
         </div>
 
         {/* Job Cards */}
@@ -204,7 +271,7 @@ const JobsPage = ({ jobs = defaultJobs }) => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-5 flex-1">
                     <img
-                      src={job.companyLogo || 'https://via.placeholder.com/50x50'}
+                      src={job.companyLogo || job.company_logo || 'https://via.placeholder.com/50x50'}
                       alt={`${job.company} logo`}
                       className="w-12 h-12 rounded-lg object-cover"
                     />
@@ -246,15 +313,15 @@ const JobsPage = ({ jobs = defaultJobs }) => {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock className="w-5 h-5 text-blue-500" />
-                          <span>{new Date(job.postedDate).toLocaleDateString()}</span>
+                          <span>{job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'Recently posted'}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <DollarSign className="w-5 h-5 text-yellow-500" />
-                          <span>{job.salary}</span>
+                          <span>{job.salary || 'Competitive'}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Users className="w-5 h-5 text-blue-500" />
-                          <span>{job.applicantCount} applicants</span>
+                          <span>{job.applicantCount || job.applicant_count || 0} applicants</span>
                         </div>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Users, Briefcase, CheckCircle, Star, TrendingUp } from 'lucide-react';
-
+import '../index.css';
 // JobCard Component
 const JobCard = ({ title, budget, clientName, status, onClick }) => (
   <div 
