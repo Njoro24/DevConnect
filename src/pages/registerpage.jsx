@@ -77,7 +77,19 @@ const RegisterPage = () => {
         bio: formData.bio,
       });
       const result = await register(data.user, data.token);
-      if (result.success) navigate('/');
+      if (result.success) {
+        // Reset form data on successful registration
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          role: '',
+          bio: '',
+          termsAgreed: false,
+        });
+        navigate('/');
+      }
     } catch (error) {
       const message = error.response?.data?.message || error.message || 'Registration failed';
       if (message.includes('duplicate')) {
