@@ -2,7 +2,14 @@ import React, { useEffect, Component } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ArrowLeft, MapPin, Clock, DollarSign, Users, Building, CheckCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  DollarSign,
+  Users,
+  Building,
+} from 'lucide-react';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
@@ -15,12 +22,12 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="text-center py-12 text-custom-text bg-custom-dark bg-opacity-80 rounded-lg shadow-lg">
+        <div className="text-center py-12 text-white bg-red-900 bg-opacity-80 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold">Something went wrong!</h2>
-          <p className="text-gray-400 mt-2">Error: {this.state.error.message}</p>
+          <p className="text-gray-300 mt-2">Error: {this.state.error.message}</p>
           <button
-            onClick={() => navigate('/jobs')}
-            className="mt-4 px-4 py-2 bg-neon-blue text-custom-light rounded-lg hover:bg-blue-700 transition-all duration-300"
+            onClick={() => window.location.href = '/jobs'}
+            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-all duration-300"
           >
             Back to Jobs
           </button>
@@ -51,7 +58,7 @@ const JobDetailPage = () => {
   };
 
   useEffect(() => {
-    console.log('Job data:', job); // Debug log to check job structure
+    console.log('Job data:', job);
     if (!job) {
       toast.error('Job details not found!', { autoClose: 2000 });
       navigate('/jobs');
@@ -65,14 +72,12 @@ const JobDetailPage = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-custom-dark relative overflow-hidden text-custom-text">
-        {/* Removed gradient and background image for plain color */}
-
-        <header className="relative z-10 bg-custom-dark bg-opacity-80 backdrop-blur-md shadow-lg border-b border-gray-800">
+      <div className="min-h-screen bg-[#1e1e2f] text-white relative overflow-hidden">
+        <header className="bg-[#232334] border-b border-gray-700 shadow-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <button
               onClick={() => navigate('/jobs')}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-custom-text rounded-lg hover:bg-gray-700 transition-all duration-300 mb-4"
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-700 text-white rounded-lg hover:bg-indigo-600 transition-all duration-300 mb-4"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Jobs
@@ -80,18 +85,18 @@ const JobDetailPage = () => {
           </div>
         </header>
 
-        <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="bg-custom-light bg-opacity-90 backdrop-blur-md rounded-xl shadow-lg p-6 border border-gray-700">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="bg-[#2a2a3f] bg-opacity-95 rounded-xl shadow-xl p-6 border border-gray-600">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-custom-text mb-2">{job.title}</h1>
+                <h1 className="text-3xl font-bold text-white mb-2">{job.title}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
                   <span className="flex items-center gap-1.5">
                     <Building className="w-5 h-5" />
                     {job.company}
                   </span>
                   {job.remote && (
-                    <span className="px-2 py-1 bg-blue-900 text-blue-200 rounded-full text-xs font-medium">
+                    <span className="px-2 py-1 bg-sky-800 text-sky-200 rounded-full text-xs font-medium">
                       Remote
                     </span>
                   )}
@@ -104,30 +109,30 @@ const JobDetailPage = () => {
               />
             </div>
 
-            <p className="text-gray-500 mb-6">{job.description}</p>
+            <p className="text-gray-300 mb-6">{job.description}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="flex items-center gap-1.5 text-gray-400">
-                <MapPin className="w-5 h-5 text-neon-blue" />
+              <div className="flex items-center gap-1.5 text-gray-300">
+                <MapPin className="w-5 h-5 text-indigo-400" />
                 <span>{job.location}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-400">
-                <Clock className="w-5 h-5 text-neon-purple" />
+              <div className="flex items-center gap-1.5 text-gray-300">
+                <Clock className="w-5 h-5 text-purple-400" />
                 <span>{new Date(job.postedDate).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-400">
-                <DollarSign className="w-5 h-5 text-yellow-400" />
+              <div className="flex items-center gap-1.5 text-gray-300">
+                <DollarSign className="w-5 h-5 text-yellow-300" />
                 <span>{job.salary}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-gray-400">
-                <Users className="w-5 h-5 text-neon-purple" />
+              <div className="flex items-center gap-1.5 text-gray-300">
+                <Users className="w-5 h-5 text-emerald-400" />
                 <span>{job.applicantCount} applicants</span>
               </div>
             </div>
 
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-custom-text mb-3">Responsibilities</h2>
-              <ul className="list-disc list-inside text-gray-500">
+              <h2 className="text-xl font-semibold text-white mb-3">Responsibilities</h2>
+              <ul className="list-disc list-inside text-gray-300">
                 {(job.responsibilities || ['No responsibilities listed']).map((resp, index) => (
                   <li key={index}>{resp}</li>
                 ))}
@@ -135,8 +140,8 @@ const JobDetailPage = () => {
             </div>
 
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-custom-text mb-3">Requirements</h2>
-              <ul className="list-disc list-inside text-gray-500">
+              <h2 className="text-xl font-semibold text-white mb-3">Requirements</h2>
+              <ul className="list-disc list-inside text-gray-300">
                 {(job.requirements || ['No requirements listed']).map((req, index) => (
                   <li key={index}>{req}</li>
                 ))}
@@ -145,7 +150,7 @@ const JobDetailPage = () => {
 
             <button
               onClick={handleApply}
-              className="w-full px-6 py-3 bg-neon-blue text-custom-light rounded-lg hover:bg-blue-700 transition-all duration-300 drop-shadow-neon-glow font-medium"
+              className="w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:brightness-110 hover:scale-[1.02] transition-all duration-300 shadow-lg"
             >
               Apply for this Job
             </button>
