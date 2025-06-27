@@ -1,13 +1,81 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom'; // Added Link import
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {
+  Search,
+  MapPin,
+  Clock,
+  DollarSign,
+  Users,
+  Building2,
+  Filter,
+  ChevronRight,
+  CheckCircle,
+  Briefcase,
+  Globe,
+  UsersRound,
+  X,
+  Heart,
+  BookmarkPlus,
+} from 'lucide-react';
+import defaultJobs from '../data/samplejobs';
+
+// Navigation Component
+const Navigation = () => {
+  return (
+    <nav className="bg-gray-900 sticky top-0 z-50 backdrop-blur-sm" style={{ border: 'none', outline: 'none', borderBottom: 'none' }}>
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="text-blue-500 text-2xl">🔗</div>
+            <span className="text-xl font-bold text-white">DevConnect</span>
+          </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              to="/jobs" 
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
+            >
+              Jobs
+            </Link>
+            <Link 
+              to="/job-details" 
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
+            >
+              Job Details
+            </Link>
+            <Link 
+              to="/profile" 
+              className="text-gray-300 hover:text-white transition-colors font-medium"
+              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
+            >
+              Meshack Njoroge
+            </Link>
+          </div>
+          {/* Sign Out Button */}
+          <button 
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            style={{ outline: 'none', border: 'none' }}
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
 // Reusable message popup
 const MessageBox = ({ message, onClose }) => {
   if (!message) return null;
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-        <p className="text-gray-800 text-lg font-semibold mb-4">{message}</p>
+      <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+        <p className="text-gray-100 text-lg font-semibold mb-4">{message}</p>
         <button
           onClick={onClose}
           className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition duration-300"
@@ -33,13 +101,15 @@ const services = [
 const Homepage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const navigate = useNavigate(); // Added navigate hook
 
   const handleBrowseJobsClick = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      setMessage("Simulated loading complete. This would navigate to /jobs in a full application.");
+      // Actually navigate to jobs page instead of showing message
+      navigate('/jobs');
     }, 2000);
   };
 
@@ -51,30 +121,18 @@ const Homepage = () => {
     <div className="bg-gray-900 min-h-screen text-gray-100 font-inter">
       <MessageBox message={message} onClose={closeMessageBox} />
 
-      {/* Header */}
-      <header className="bg-gray-800 shadow-lg py-5 px-6 fixed w-full z-20 top-0">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-extrabold text-blue-400 tracking-tight">DevConnect</h1>
-          <nav className="space-x-6 text-base font-semibold">
-            <Link to="/jobs" className="text-gray-300 hover:text-blue-300 transition duration-300">
-              Find Jobs
-            </Link>
-            <Link to="/register" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
-              Post a Job
-            </Link>
-          </nav>
-        </div>
-      </header>
+      {/* Navigation */}
+      <Navigation />
 
       {/* Hero Section */}
-      <section className="pt-36 pb-24 bg-gradient-to-br from-gray-900 to-gray-800 text-center px-6 border-b border-gray-700">
+      <section className="pt-20 pb-24 bg-gradient-to-br from-gray-900 to-gray-800 text-center px-6">
         <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight">
           Connecting Elite Developers with Stellar Opportunities
         </h2>
         <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
           DevConnect is your premier platform to discover top-tier development talent or secure your next groundbreaking project.
         </p>
-        <div className="flex justify-center space-x-6">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
           <button
             onClick={handleBrowseJobsClick}
             disabled={loading}
@@ -110,12 +168,12 @@ const Homepage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white text-center py-20 px-6">
+      <section className="bg-gray-800 text-white text-center py-20 px-6">
         <h3 className="text-4xl font-extrabold mb-6">Ready to Connect?</h3>
         <p className="text-lg mb-10 max-w-2xl mx-auto">
           Join DevConnect today and elevate your career or find the perfect developer for your team.
         </p>
-        <div className="flex justify-center space-x-6">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
           <Link to="/register" className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
             Get Started - It's Free!
           </Link>
@@ -126,7 +184,7 @@ const Homepage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-700 text-sm text-gray-400 text-center py-8 px-6">
+      <footer className="bg-gray-900 text-sm text-gray-400 text-center py-8 px-6">
         <p className="mb-4">© {new Date().getFullYear()} DevConnect. All rights reserved.</p>
         <div className="flex justify-center space-x-6 mt-2">
           <Link to="/about" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</Link>
@@ -139,3 +197,5 @@ const Homepage = () => {
 };
 
 export default Homepage;
+
+

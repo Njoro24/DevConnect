@@ -68,3 +68,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+.no-outline {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+nav {
+  border: none !important;
+}
+
+nav * {
+  outline: none !important;
+  border: none !important;
+}
