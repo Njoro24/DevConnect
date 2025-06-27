@@ -12,9 +12,11 @@ import {
   Users, 
   Building2,
   Filter,
-  Star,
   ChevronRight,
-  CheckCircle
+  CheckCircle,
+  Briefcase,
+  Globe,
+  UsersRound,
 } from 'lucide-react';
 import defaultJobs from '../data/samplejobs';
 
@@ -62,8 +64,9 @@ const JobsPage = () => {
       job.location?.toLowerCase().includes(locationFilter.toLowerCase());
     
     const matchesType = !typeFilter || job.type === typeFilter;
-    
-    const matchesRemote = !remoteFilter || 
+
+    const matchesRemote =
+      !remoteFilter ||
       (remoteFilter === 'remote' && job.remote) ||
       (remoteFilter === 'on-site' && !job.remote);
 
@@ -76,7 +79,7 @@ const JobsPage = () => {
     if (priority === 'urgent') {
       return `${baseClasses} bg-red-700 text-white border border-red-800`;
     }
-    
+
     switch (status) {
       case 'active':
         return `${baseClasses} bg-green-600 text-white border border-green-700`;
@@ -90,9 +93,12 @@ const JobsPage = () => {
   const getStatusText = (status, priority) => {
     if (priority === 'urgent') return 'Urgent';
     switch (status) {
-      case 'active': return 'Active';
-      case 'closing-soon': return 'Closing Soon';
-      default: return 'Open';
+      case 'active':
+        return 'Active';
+      case 'closing-soon':
+        return 'Closing Soon';
+      default:
+        return 'Open';
     }
   };
 
@@ -325,16 +331,16 @@ const JobsPage = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleApply(job); }}
-                      className="p-2 text-gray-400 hover:text-green-400 transition duration-200"
-                    >
-                      <CheckCircle className="w-6 h-6" />
-                    </button>
-                    <ChevronRight className="w-6 h-6 text-gray-400 hover:text-blue-400 transition duration-200" />
+                    <div className="flex items-center gap-4 ml-6">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleApply(job); }}
+                        className="p-2 text-gray-400 hover:text-green-400 transition duration-200"
+                      >
+                        <CheckCircle className="w-6 h-6" />
+                      </button>
+                      <ChevronRight className="w-6 h-6 text-gray-400 hover:text-blue-400 transition duration-200" />
+                    </div>
                   </div>
                 </div>
               </div>

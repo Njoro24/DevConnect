@@ -36,7 +36,9 @@ const Navbar = () => {
               <>
                 <Link to="/jobs" className="nav-link">Jobs</Link>
                 <Link to="/jobdetails" className="nav-link">Job Details</Link>
-                <span className="text-gray-800 font-semibold">{getUserName()}</span>
+                <Link to="/profile" className="text-gray-800 font-semibold hover:text-blue-700 transition">
+                  {getUserName()}
+                </Link>
                 <button
                   onClick={logout}
                   className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
