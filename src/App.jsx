@@ -1,114 +1,122 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './context/Authcontext';
 
-// Layout components
+
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
-// Page components
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
+
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
 import RegisterPage from './pages/registerpage';
 import ProfilePage from './pages/profilepage';
 import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
+import NotFound from './pages/Notfound';
 
-// CSS
-import './App.css';
+
+
 
 function App() {
   return (
-    <div className="App">
-      <Routes>
-        {/* Public Routes - these don't need authentication */}
-        <Route 
-          path="/login" 
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/register" 
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          } 
-        />
+    <div className="App min-h-screen bg-gray-50">
+      <Layout>
+        <Routes>
+         
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+
         
-        {/* Protected Routes - these need authentication */}
-        <Route 
-          path="/" 
-          element={
-            <PrivateRoute>
-              <Layout>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
                 <HomePage />
-              </Layout>
-            </PrivateRoute>
-          } 
-        />
-        
-        <Route 
-          path="/profile" 
-          element={
-            <PrivateRoute>
-              <Layout>
+              </PrivateRoute>
+            }
+          />
+          
+          <Route 
+            path="/profile/:userId" 
+            element={
+              <PrivateRoute>
                 <ProfilePage />
-              </Layout>
-            </PrivateRoute>
-          } 
-        />
-        
-        <Route 
-          path="/jobs" 
-          element={
-            <PrivateRoute>
-              <Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/jobs"
+            element={
+              <PrivateRoute>
                 <JobsPage />
-              </Layout>
-            </PrivateRoute>
-          } 
-        />
-        
-        <Route 
-          path="/jobs/:id" 
-          element={
-            <PrivateRoute>
-              <Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/jobs/:id"
+            element={
+              <PrivateRoute>
                 <JobDetailsPage />
-              </Layout>
-            </PrivateRoute>
-          } 
-        />
+              </PrivateRoute>
+            }
+          />
+
+         
+          <Route 
+            path="/home" 
+            element={<Navigate to="/" replace />} 
+          />
+
         
-        {/* Catch all route - redirect to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Layout>
+      
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }
-
-// Public Route component - redirects to home if already logged in
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-  
-  // If user is already authenticated, redirect to home
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
 
 export default App;

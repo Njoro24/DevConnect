@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useMemo } from 'react';
-import { API_ENDPOINTS } from '../data/api/constants.js';
 
 export const AuthContext = createContext({
   user: null,
@@ -45,8 +44,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Use the PROFILE endpoint instead of verify-token
-      const response = await fetch(API_ENDPOINTS.PROFILE, {
+      const response = await fetch('/api/verify-token', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${savedToken}`,
@@ -83,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      const response = await fetch(API_ENDPOINTS.REGISTER, {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -95,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       try {
         data = rawText ? JSON.parse(rawText) : {};
       } catch (e) {
-        console.error('Failed to parse JSON response:', e, rawText);
+        console.error('Failed to parse JSON response:', e);
       }
 
       if (!response.ok) {
@@ -105,16 +103,8 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      const token = data.access_token || data.token;
-      if (!token) {
-        return {
-          success: false,
-          error: 'Token missing in response'
-        };
-      }
-
-      await login(data.user, token);
-      return { success: true };
+      await login(data.user, data.token);
+      return { success: true, data };
     } catch (error) {
       console.error('Registration error:', error);
       return { success: false, error: 'Network error' };
@@ -124,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (token) {
-        await fetch(API_ENDPOINTS.LOGOUT, {
+        await fetch('/api/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -145,12 +135,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getAuthHeaders = () => {
-    return token
-      ? {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      : { 'Content-Type': 'application/json' };
+    return token ? {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    } : { 'Content-Type': 'application/json' };
   };
 
   const apiCall = async (url, options = {}) => {
@@ -171,25 +159,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const contextValue = useMemo(
-    () => ({
-      user,
-      token,
-      isLoading,
-      isAuthenticated,
-      login,
-      register,
-      logout,
-      updateUser,
-      checkAuthStatus,
-      getAuthHeaders,
-      apiCall,
-      getUserRole: () => user?.role || null,
-      getUserId: () => user?.id || null,
-      getUserName: () => user?.name || user?.email || 'User'
-    }),
-    [user, token, isLoading, isAuthenticated]
-  );
+  const contextValue = useMemo(() => ({
+    user,
+    token,
+    isLoading,
+    isAuthenticated,
+    login,
+    register,
+    logout,
+    updateUser,
+    checkAuthStatus,
+    getAuthHeaders,
+    apiCall,
+    getUserRole: () => user?.role || null,
+    getUserId: () => user?.id || null,
+    getUserName: () => user?.name || user?.email || 'User'
+  }), [user, token, isLoading, isAuthenticated]);
 
   return (
     <AuthContext.Provider value={contextValue}>
