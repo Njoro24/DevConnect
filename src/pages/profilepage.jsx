@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/Authcontext';
-import { authAPI } from '../services/api';
 import PropTypes from 'prop-types';
 
 const DeveloperProfile = ({ skills, appliedJobs }) => (
