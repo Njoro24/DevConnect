@@ -45,7 +45,10 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     setIsLoading(true);
+    setErrors({}); // Clear previous general errors
+
     try {
       const { data } = await authAPI.login(formData);
       const result = await login(data.user, data.token);

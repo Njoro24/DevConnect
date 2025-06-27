@@ -2,7 +2,18 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ArrowLeft, MapPin, Clock, DollarSign, Users, Building, ChevronRight, Bookmark, Share2, ExternalLink } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Clock, 
+  DollarSign, 
+  Users, 
+  Building, 
+  ChevronRight, 
+  Bookmark, 
+  Share2, 
+  ExternalLink 
+} from 'lucide-react';
 
 // Error Boundary Component using hooks
 const useErrorBoundary = () => {
