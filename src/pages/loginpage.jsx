@@ -38,8 +38,8 @@ const LoginPage = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors({});
-
+    setErrors({}); // Clear previous errors
+    
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',

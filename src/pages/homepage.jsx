@@ -235,6 +235,16 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 border-t border-gray-700 text-sm text-gray-400 text-center py-8 px-6">
+        <p className="mb-4">© {new Date().getFullYear()} SkillSwap. All rights reserved.</p>
+        <div className="flex justify-center space-x-6 mt-2">
+          <Link to="/about" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</Link>
+          <Link to="/contact" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Contact Support</Link>
+          <Link to="/privacy" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Privacy Policy</Link>
+        </div>
+      </footer>
     </div>
   );
 };
