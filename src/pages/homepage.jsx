@@ -1,30 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Added Link import
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import {
-  Search,
-  MapPin,
-  Clock,
-  DollarSign,
-  Users,
-  Building2,
-  Filter,
-  ChevronRight,
-  CheckCircle,
-  Briefcase,
-  Globe,
-  UsersRound,
-  X,
-  Heart,
-  BookmarkPlus,
-} from 'lucide-react';
-import defaultJobs from '../data/samplejobs';
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
+import { useAuth } from '../context/Authcontext'; 
 
-// Navigation Component
-const Navigation = () => {
+const Navigation = ({ handleSignOut, userName }) => {
   return (
-    <nav className="bg-gray-900 sticky top-0 z-50 backdrop-blur-sm" style={{ border: 'none', outline: 'none', borderBottom: 'none' }}>
+    <nav className="bg-gray-900 sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -34,32 +15,20 @@ const Navigation = () => {
           </div>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/jobs" 
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
-            >
+            <button className="text-gray-300 hover:text-white transition-colors font-medium">
               Jobs
-            </Link>
-            <Link 
-              to="/job-details" 
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
-            >
+            </button>
+            <button className="text-gray-300 hover:text-white transition-colors font-medium">
               Job Details
-            </Link>
-            <Link 
-              to="/profile" 
-              className="text-gray-300 hover:text-white transition-colors font-medium"
-              style={{ textDecoration: 'none', outline: 'none', border: 'none' }}
-            >
-              Meshack Njoroge
-            </Link>
+            </button>
+            <button className="text-gray-300 hover:text-white transition-colors font-medium">
+              {userName}
+            </button>
           </div>
           {/* Sign Out Button */}
           <button 
+            onClick={handleSignOut}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            style={{ outline: 'none', border: 'none' }}
           >
             Sign out
           </button>
@@ -69,7 +38,25 @@ const Navigation = () => {
   );
 };
 
-// Reusable message popup
+// Toast notification component
+const Toast = ({ message, type, onClose }) => {
+  if (!message) return null;
+  
+  const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+  
+  return (
+    <div className="fixed top-20 right-4 z-50">
+      <div className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2`}>
+        <span>{message}</span>
+        <button onClick={onClose} className="ml-2 text-white hover:text-gray-200">
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 const MessageBox = ({ message, onClose }) => {
   if (!message) return null;
   return (
@@ -99,30 +86,65 @@ const services = [
 ];
 
 const Homepage = () => {
+  const navigate = useNavigate();
+  const { logout, getUserName } = useAuth(); // Use the auth context
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const navigate = useNavigate(); // Added navigate hook
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  // Updated sign-out function that uses the auth context
+  const handleSignOut = async () => {
+    try {
+      setLoading(true);
+      setToast({ message: 'Signing out...', type: 'success' });
+      
+      console.log('Starting sign out process...');
+      
+      // Use the logout function from auth context
+      logout();
+      
+      console.log('Auth context logout completed');
+      
+      // Clear the toast
+      setToast({ message: '', type: '' });
+      setLoading(false);
+      
+      // Navigate to login page
+      navigate('/login', { replace: true });
+      
+      console.log('Navigation to login completed');
+      
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setLoading(false);
+      setToast({ message: 'Error signing out. Please try again.', type: 'error' });
+      
+      // Even if there's an error, try to navigate to login
+      setTimeout(() => {
+        navigate('/login', { replace: true });
+      }, 2000);
+    }
+  };
 
   const handleBrowseJobsClick = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // Actually navigate to jobs page instead of showing message
-      navigate('/jobs');
+      setMessage('Jobs page would load here in the full application!');
     }, 2000);
   };
 
-  const closeMessageBox = () => {
-    setMessage(null);
-  };
+  const closeMessageBox = () => setMessage(null);
+  const closeToast = () => setToast({ message: '', type: '' });
 
   return (
     <div className="bg-gray-900 min-h-screen text-gray-100 font-inter">
+      <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       <MessageBox message={message} onClose={closeMessageBox} />
 
       {/* Navigation */}
-      <Navigation />
+      <Navigation handleSignOut={handleSignOut} userName={getUserName()} />
 
       {/* Hero Section */}
       <section className="pt-20 pb-24 bg-gradient-to-br from-gray-900 to-gray-800 text-center px-6">
@@ -148,9 +170,9 @@ const Homepage = () => {
             )}
             {loading ? 'Loading Jobs...' : 'Browse Jobs'}
           </button>
-          <Link to="/register" className="bg-transparent border-2 border-blue-600 text-blue-400 px-8 py-4 rounded-full font-bold hover:bg-blue-600 hover:text-white transition duration-300 shadow-lg transform hover:scale-105">
+          <button className="bg-transparent border-2 border-blue-600 text-blue-400 px-8 py-4 rounded-full font-bold hover:bg-blue-600 hover:text-white transition duration-300 shadow-lg transform hover:scale-105">
             Post a Job
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -174,12 +196,12 @@ const Homepage = () => {
           Join DevConnect today and elevate your career or find the perfect developer for your team.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
-          <Link to="/register" className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
+          <button className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
             Get Started - It's Free!
-          </Link>
-          <Link to="/contact" className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-blue-700 transition duration-300 transform hover:scale-105">
+          </button>
+          <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-blue-700 transition duration-300 transform hover:scale-105">
             Learn More
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -187,9 +209,9 @@ const Homepage = () => {
       <footer className="bg-gray-900 text-sm text-gray-400 text-center py-8 px-6">
         <p className="mb-4">© {new Date().getFullYear()} DevConnect. All rights reserved.</p>
         <div className="flex justify-center space-x-6 mt-2">
-          <Link to="/about" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</Link>
-          <Link to="/contact" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Contact Support</Link>
-          <Link to="/privacy" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Privacy Policy</Link>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</button>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Contact Support</button>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Privacy Policy</button>
         </div>
       </footer>
     </div>
@@ -197,5 +219,3 @@ const Homepage = () => {
 };
 
 export default Homepage;
-
-
