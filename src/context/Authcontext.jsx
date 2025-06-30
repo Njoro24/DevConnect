@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await fetch('/api/verify-token', {
+      const response = await fetch('/api/auth/verify-token', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${savedToken}`,
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
