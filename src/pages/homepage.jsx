@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
@@ -21,9 +22,12 @@ const Navigation = ({ handleSignOut, userName }) => {
             <button className="text-gray-300 hover:text-white transition-colors font-medium">
               Job Details
             </button>
-            <button className="text-gray-300 hover:text-white transition-colors font-medium">
-              {userName}
-            </button>
+            <Link
+            to="/profile"
+            className="bg-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+               {userName}
+            </Link>
           </div>
           {/* Sign Out Button */}
           <button 

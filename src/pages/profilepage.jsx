@@ -1,151 +1,119 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/Authcontext';
-import PropTypes from 'prop-types';
-
-const DeveloperProfile = ({ skills, appliedJobs }) => (
-  <section aria-labelledby="skills-heading">
-    <h2 id="skills-heading" className="text-xl font-semibold mb-2">Skills</h2>
-    <ul role="list" className="mb-4 list-disc list-inside">
-      {skills.map(skill => (
-        <li key={skill.id}>
-          {skill.name} — <span className="text-sm text-gray-500">{skill.level}</span>
-        </li>
-      ))}
-    </ul>
-    <h2 id="jobs-heading" className="text-xl font-semibold mb-2">Applied Jobs</h2>
-    <ul role="list" className="list-disc list-inside">
-      {appliedJobs.map(job => (
-        <li key={job.id}>
-          <Link to={`/jobs/${job.id}`} className="hover:underline">
-            {job.title}
-          </Link> at <span className="font-medium">{job.company}</span>
-        </li>
-      ))}
-    </ul>
-  </section>
-);
-
-const ClientProfile = ({ postedJobs }) => (
-  <section aria-labelledby="jobs-heading">
-    <h2 id="jobs-heading" className="text-xl font-semibold mb-2">Posted Jobs</h2>
-    <ul role="list" className="list-disc list-inside">
-      {postedJobs.map(job => (
-        <li key={job.id}>
-          <Link to={`/jobs/${job.id}`} className="hover:underline">
-            {job.title}
-          </Link> — <span className="text-sm text-green-600">{job.status}</span>
-        </li>
-      ))}
-    </ul>
-  </section>
-);
+import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
-  const { userId } = useParams();
-  const { isAuthenticated } = useAuth();
+  const { getAuthHeaders } = useAuth();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      setIsLoading(true);
       try {
-        const { data } = await authAPI.getProfile(userId);
-        setProfile(data);
+        const response = await fetch('/api/auth/me', {
+          headers: getAuthHeaders(),
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch profile');
+        const result = await response.json();
+        setProfile(result.user);
       } catch (err) {
-        setError(err.message || 'Failed to load profile');
+        setError(err.message || 'Something went wrong');
       } finally {
         setIsLoading(false);
       }
     };
-    if (isAuthenticated) fetchProfile();
-  }, [userId, isAuthenticated]);
 
-  if (!isAuthenticated) return (
-    <p role="alert" className="p-6 text-red-600">
-      Please <Link to="/login" className="underline">log in</Link> to view profiles.
-    </p>
-  );
-  if (isLoading) return <p className="p-6 text-gray-600">Loading profile...</p>;
-  if (error) return <p role="alert" className="p-6 text-red-600">{error}</p>;
-  if (!profile) return (
-    <p role="alert" className="p-6 text-red-600">
-      Profile not found for user ID: {userId}
-    </p>
-  );
+    fetchProfile();
+  }, []);
+
+  if (isLoading)
+    return <div className="text-center text-white py-10">Loading profile...</div>;
+  if (error)
+    return <div className="text-center text-red-500 py-10">{error}</div>;
+  if (!profile)
+    return <div className="text-center text-gray-400 py-10">No profile data found.</div>;
 
   return (
-    <main className="max-w-4xl mx-auto p-4 sm:p-6 bg-white rounded shadow mt-6 sm:mt-10" aria-labelledby="profile-title">
-      <h1 id="profile-title" className="text-2xl sm:text-3xl font-bold text-blue-800 mb-2">{profile.name}</h1>
-      <p className="text-sm sm:text-base text-gray-600 italic mb-4">{profile.role}</p>
-      <p className="text-sm sm:text-base mb-6">{profile.bio}</p>
+    <main className="bg-gray-900 min-h-screen text-gray-100 px-6 py-10 font-inter">
+      <div className="max-w-4xl mx-auto bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold mb-1">{profile.name}</h1>
+        <p className="text-blue-400 mb-4 italic">{profile.role}</p>
+        <p className="text-gray-300 mb-6">{profile.bio || 'No bio added yet.'}</p>
 
-      {profile.role === 'Developer' && (
-        <DeveloperProfile skills={profile.skills} appliedJobs={profile.appliedJobs} />
-      )}
-      {profile.role === 'Client' && (
-        <ClientProfile postedJobs={profile.postedJobs} />
-      )}
+        {/* Developer View */}
+        {profile.role === 'Developer' && (
+          <>
+            <section className="mb-6">
+              <h2 className="text-xl font-semibold text-white mb-2">Skills</h2>
+              <div className="flex flex-wrap gap-3">
+                {profile.skills?.length > 0 ? (
+                  profile.skills.map((skill) => (
+                    <span
+                      key={skill.id}
+                      className="bg-blue-700 px-4 py-2 rounded-full text-sm shadow"
+                    >
+                      {skill.name}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400">No skills listed.</p>
+                )}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-white mb-2">Applied Jobs</h2>
+              <ul className="list-disc list-inside space-y-1">
+                {profile.applications?.length > 0 ? (
+                  profile.applications.map((app) =>
+                    app.job ? (
+                      <li key={app.id}>
+                        <Link
+                          to={`/jobs/${app.job.id}`}
+                          className="text-blue-400 hover:underline"
+                        >
+                          {app.job.title}
+                        </Link>{' '}
+                        <span className="text-sm text-gray-400">({app.status})</span>
+                      </li>
+                    ) : null
+                  )
+                ) : (
+                  <p className="text-sm text-gray-400">No job applications yet.</p>
+                )}
+              </ul>
+            </section>
+          </>
+        )}
+
+        {/* Client View */}
+        {profile.role === 'Client' && (
+          <section>
+            <h2 className="text-xl font-semibold text-white mb-2">Posted Jobs</h2>
+            <ul className="list-disc list-inside space-y-1">
+              {profile.posted_jobs?.length > 0 ? (
+                profile.posted_jobs.map((job) => (
+                  <li key={job.id}>
+                    <Link
+                      to={`/jobs/${job.id}`}
+                      className="text-blue-400 hover:underline"
+                    >
+                      {job.title}
+                    </Link>{' '}
+                    <span className="text-sm text-green-400">({job.status})</span>
+                  </li>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400">No posted jobs yet.</p>
+              )}
+            </ul>
+          </section>
+        )}
+      </div>
     </main>
   );
-};
-
-DeveloperProfile.propTypes = {
-  skills: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      level: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  appliedJobs: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      company: PropTypes.string.isRequired
-    })
-  ).isRequired
-};
-
-ClientProfile.propTypes = {
-  postedJobs: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired
-    })
-  ).isRequired
-};
-
-ProfilePage.propTypes = {
-  profile: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    role: PropTypes.oneOf(['Developer', 'Client']).isRequired,
-    bio: PropTypes.string.isRequired,
-    skills: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        level: PropTypes.string.isRequired
-      })
-    ),
-    appliedJobs: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        company: PropTypes.string.isRequired
-      })
-    ),
-    postedJobs: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        status: PropTypes.string.isRequired
-      })
-    )
-  })
 };
 
 export default ProfilePage;
