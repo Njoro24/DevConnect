@@ -15,7 +15,6 @@ import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
-// PublicRoute wrapper
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return !isAuthenticated ? children : <Navigate to="/" replace />;
@@ -86,13 +85,14 @@ function App() {
             }
           />
 
-          {/* Redirect root aliases */}
+          {/* Redirect /home to / */}
           <Route path="/home" element={<Navigate to="/" replace />} />
+
+          {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
 
-      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}

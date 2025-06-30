@@ -99,11 +99,11 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         return {
           success: false,
-          error: data.message || 'Registration failed'
+          error: data.error || 'Registration failed'
         };
       }
 
-      await login(data.user, data.token);
+      await login(data.user, data.access_token);
       return { success: true, data };
     } catch (error) {
       console.error('Registration error:', error);
