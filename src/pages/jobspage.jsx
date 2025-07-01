@@ -18,8 +18,242 @@ import {
   X,
   Heart,
   BookmarkPlus,
+  Send,
+  Linkedin,
+  Mail,
+  FileText,
+  User,
 } from 'lucide-react';
 import defaultJobs from '../data/samplejobs';
+
+// Application Modal Component
+const ApplicationModal = ({ job, isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    linkedinUrl: '',
+    coverLetter: '',
+    fullName: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.email || !formData.fullName) {
+      toast.error('Please fill in all required fields', { autoClose: 3000 });
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address', { autoClose: 3000 });
+      return;
+    }
+
+    // LinkedIn URL validation (if provided)
+    if (formData.linkedinUrl && !formData.linkedinUrl.includes('linkedin.com')) {
+      toast.error('Please enter a valid LinkedIn URL', { autoClose: 3000 });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      onSubmit({
+        ...formData,
+        jobId: job.id,
+        jobTitle: job.title,
+        company: job.company,
+        appliedAt: new Date().toISOString()
+      });
+      
+      // Reset form
+      setFormData({
+        email: '',
+        linkedinUrl: '',
+        coverLetter: '',
+        fullName: ''
+      });
+      
+      onClose();
+      toast.success(`Successfully applied to ${job.title} at ${job.company}!`, { 
+        autoClose: 4000,
+        icon: <CheckCircle className="w-5 h-5" />
+      });
+    } catch (error) {
+      toast.error('Failed to submit application. Please try again.', { autoClose: 3000 });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-800 rounded-2xl border border-gray-700/50 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-start justify-between p-6 border-b border-gray-700/50">
+          <div className="flex items-start gap-4">
+            <img
+              src={job?.companyLogo || 'https://via.placeholder.com/60x60'}
+              alt={`${job?.company} logo`}
+              className="w-12 h-12 rounded-xl object-cover border border-gray-600/50"
+            />
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Apply for {job?.title}</h2>
+              <p className="text-gray-400 flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                {job?.company} • {job?.location}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-700/50 rounded-xl transition-colors text-gray-400 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Full Name */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <User className="w-4 h-4" />
+              Full Name *
+            </label>
+            <input
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleInputChange}
+              required
+              placeholder="Enter your full name"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <Mail className="w-4 h-4" />
+              Email Address *
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              placeholder="your.email@example.com"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+            />
+          </div>
+
+          {/* LinkedIn URL */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <Linkedin className="w-4 h-4" />
+              LinkedIn Profile URL
+            </label>
+            <input
+              type="url"
+              name="linkedinUrl"
+              value={formData.linkedinUrl}
+              onChange={handleInputChange}
+              placeholder="https://linkedin.com/in/your-profile"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400"
+            />
+            <p className="text-xs text-gray-500 mt-1">Optional but recommended</p>
+          </div>
+
+          {/* Cover Letter */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <FileText className="w-4 h-4" />
+              Cover Letter
+            </label>
+            <textarea
+              name="coverLetter"
+              value={formData.coverLetter}
+              onChange={handleInputChange}
+              rows={4}
+              placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-white placeholder-gray-400 resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">Optional - help stand out from other candidates</p>
+          </div>
+
+          {/* Job Details Summary */}
+          <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/30">
+            <h3 className="text-sm font-semibold text-gray-300 mb-3">Application Summary</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-400">Position:</span>
+                <p className="text-white font-medium">{job?.title}</p>
+              </div>
+              <div>
+                <span className="text-gray-400">Company:</span>
+                <p className="text-white font-medium">{job?.company}</p>
+              </div>
+              <div>
+                <span className="text-gray-400">Location:</span>
+                <p className="text-white font-medium">{job?.location}</p>
+              </div>
+              <div>
+                <span className="text-gray-400">Salary:</span>
+                <p className="text-white font-medium">{job?.salary}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-6 py-3 border border-gray-600/50 text-gray-300 rounded-xl hover:bg-gray-700/50 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Submit Application
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 // Navigation Component
 const Navigation = () => {
@@ -71,6 +305,11 @@ const JobsPage = ({ jobs = defaultJobs }) => {
   const [remoteFilter, setRemoteFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [savedJobs, setSavedJobs] = useState(new Set());
+  const [applicationModal, setApplicationModal] = useState({
+    isOpen: false,
+    job: null
+  });
+  const [applications, setApplications] = useState([]);
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -127,7 +366,23 @@ const JobsPage = ({ jobs = defaultJobs }) => {
   };
 
   const handleApply = (job) => {
-    toast.success(`Applied to ${job.title} successfully!`, { autoClose: 3000 });
+    setApplicationModal({
+      isOpen: true,
+      job: job
+    });
+  };
+
+  const handleApplicationSubmit = (applicationData) => {
+    setApplications(prev => [...prev, applicationData]);
+    // You can also send this data to your backend API here
+    console.log('Application submitted:', applicationData);
+  };
+
+  const handleCloseModal = () => {
+    setApplicationModal({
+      isOpen: false,
+      job: null
+    });
   };
 
   const handleSaveJob = (jobId, e) => {
@@ -152,6 +407,7 @@ const JobsPage = ({ jobs = defaultJobs }) => {
   };
 
   const hasActiveFilters = searchTerm || locationFilter || typeFilter || remoteFilter;
+  const hasAppliedToJob = (jobId) => applications.some(app => app.jobId === jobId);
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -332,6 +588,12 @@ const JobsPage = ({ jobs = defaultJobs }) => {
                               Remote
                             </span>
                           )}
+                          {hasAppliedToJob(job.id) && (
+                            <span className="px-3 py-1 bg-blue-900/20 text-blue-400 rounded-full text-xs font-semibold border border-blue-800/30 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" />
+                              Applied
+                            </span>
+                          )}
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
                           {job.title}
@@ -395,9 +657,14 @@ const JobsPage = ({ jobs = defaultJobs }) => {
                           e.stopPropagation();
                           handleApply(job);
                         }}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium text-sm"
+                        disabled={hasAppliedToJob(job.id)}
+                        className={`px-4 py-2 rounded-xl transition-colors font-medium text-sm ${
+                          hasAppliedToJob(job.id)
+                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
                       >
-                        Apply
+                        {hasAppliedToJob(job.id) ? 'Applied' : 'Apply'}
                       </button>
                       <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-blue-400 transition-colors" />
                     </div>
@@ -471,9 +738,49 @@ const JobsPage = ({ jobs = defaultJobs }) => {
                 </div>
               </div>
             </div>
+
+            {/* Applied Jobs Summary */}
+            {applications.length > 0 && (
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-green-400" />
+                  Your Applications
+                </h3>
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">{applications.length}</div>
+                    <div className="text-sm text-gray-400">Applications Submitted</div>
+                  </div>
+                  <div className="space-y-2">
+                    {applications.slice(-3).map((app, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-2 bg-gray-700/30 rounded-lg">
+                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{app.jobTitle}</p>
+                          <p className="text-xs text-gray-400">{app.company}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {applications.length > 3 && (
+                    <div className="text-center text-sm text-gray-400">
+                      +{applications.length - 3} more applications
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </main>
+
+      {/* Application Modal */}
+      <ApplicationModal
+        job={applicationModal.job}
+        isOpen={applicationModal.isOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleApplicationSubmit}
+      />
 
       <ToastContainer 
         position="top-right" 
