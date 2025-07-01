@@ -8,12 +8,6 @@ import { useAuth } from './context/Authcontext';
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
-// Create PublicRoute component for routes that should only be accessible when not authenticated
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? children : <Navigate to="/" replace />;
-};
-
 // Page components
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
@@ -23,12 +17,18 @@ import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
+// Public route component
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
 function App() {
   return (
     <div className="App min-h-screen bg-gray-50">
       <Layout>
         <Routes>
-          {/* Public Routes - accessible without authentication */}
+          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -46,24 +46,20 @@ function App() {
             }
           />
 
-          {/* Protected Routes - require authentication */}
+          {/* Protected Routes */}
           <Route
             path="/"
             element={
               <PrivateRoute>
                 <HomePage />
-feature/profile-footer
-              </Layout>
-            </PrivateRoute>
-          } 
-        />
-        
-        <Route 
-          path="/profile/:userId" 
-          element={
-            <PrivateRoute>
-              <Layout>
-
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
               </PrivateRoute>
             }
           />
@@ -71,7 +67,6 @@ feature/profile-footer
             path="/profile"
             element={
               <PrivateRoute>
-
                 <ProfilePage />
               </PrivateRoute>
             }
@@ -93,18 +88,14 @@ feature/profile-footer
             }
           />
 
-          {/* Redirect root to home if authenticated, otherwise to login */}
-          <Route 
-            path="/home" 
-            element={<Navigate to="/" replace />} 
-          />
+          {/* Redirect /home to / */}
+          <Route path="/home" element={<Navigate to="/" replace />} />
 
-          {/* 404 route - should be last */}
+          {/* Fallback 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
-      
-      {/* Toast Container - should be outside Layout but inside main div */}
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
