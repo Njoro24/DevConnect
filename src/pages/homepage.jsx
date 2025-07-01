@@ -1,252 +1,225 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Users, Briefcase, CheckCircle, Star, TrendingUp } from 'lucide-react';
-import '../index.css';
+import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
+import { useAuth } from '../context/Authcontext'; 
 
-const JobCard = ({ title, budget, clientName, status, onClick }) => (
-  <div 
-    onClick={onClick}
-    className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 cursor-pointer hover:border-blue-300"
-  >
-    <div className="flex items-start justify-between mb-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-2 flex-1">{title}</h3>
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-        status === 'open' 
-          ? 'bg-green-100 text-green-800' 
-          : 'bg-gray-100 text-gray-600'
-      }`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    </div>
-    
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-2xl font-bold text-green-600">${budget}</p>
-        <p className="text-sm text-gray-600">by {clientName}</p>
+const Navigation = ({ handleSignOut, userName }) => {
+  return (
+    <nav className="bg-gray-900 sticky top-0 z-50 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="text-blue-500 text-2xl">🔗</div>
+            <span className="text-xl font-bold text-white">DevConnect</span>
+          </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8">
+            <button className="text-gray-300 hover:text-white transition-colors font-medium">
+              Jobs
+            </button>
+            <button className="text-gray-300 hover:text-white transition-colors font-medium">
+              Job Details
+            </button>
+            <Link
+            to="/profile"
+            className="bg-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+               {userName}
+            </Link>
+          </div>
+          {/* Sign Out Button */}
+          <button 
+            onClick={handleSignOut}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
-      <ArrowRight className="w-5 h-5 text-gray-400" />
-    </div>
-  </div>
-);
+    </nav>
+  );
+};
 
-const HomePage = () => {
-  const navigate = useNavigate();
+// Toast notification component
+const Toast = ({ message, type, onClose }) => {
+  if (!message) return null;
   
-  const featuredJobs = [
-    {
-      id: 1,
-      title: 'React Frontend Developer Needed',
-      budget: 500,
-      clientName: 'John Doe',
-      status: 'open'
-    },
-    {
-      id: 2,
-      title: 'Build a Flask API Backend',
-      budget: 800,
-      clientName: 'Jane Smith',
-      status: 'open'
-    },
-    {
-      id: 3,
-      title: 'Mobile App UI/UX Design',
-      budget: 1200,
-      clientName: 'Tech Startup Inc.',
-      status: 'open'
-    },
-    {
-      id: 4,
-      title: 'WordPress E-commerce Site',
-      budget: 600,
-      clientName: 'Small Business Owner',
-      status: 'closed'
-    }
-  ];
+  const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+  
+  return (
+    <div className="fixed top-20 right-4 z-50">
+      <div className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2`}>
+        <span>{message}</span>
+        <button onClick={onClose} className="ml-2 text-white hover:text-gray-200">
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
-  const handleJobClick = (job) => {
-    navigate(`/jobs/${job.id}`, { state: { job } });
+
+const MessageBox = ({ message, onClose }) => {
+  if (!message) return null;
+  return (
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+      <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+        <p className="text-gray-100 text-lg font-semibold mb-4">{message}</p>
+        <button
+          onClick={onClose}
+          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition duration-300"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const services = [
+  { title: "Web Development", image: "https://placehold.co/80x80/1E40AF/ffffff?text=Web" },
+  { title: "UI/UX Design", image: "https://placehold.co/80x80/1E40AF/ffffff?text=UI/UX" },
+  { title: "Mobile Apps", image: "https://placehold.co/80x80/1E40AF/ffffff?text=Mobile" },
+  { title: "Backend Development", image: "https://placehold.co/80x80/1E40AF/ffffff?text=Backend" },
+  { title: "DevOps & Cloud", image: "https://placehold.co/80x80/1E40AF/ffffff?text=DevOps" },
+  { title: "AI & Machine Learning", image: "https://placehold.co/80x80/1E40AF/ffffff?text=AI/ML" },
+  { title: "Game Development", image: "https://placehold.co/80x80/1E40AF/ffffff?text=Game" },
+  { title: "Cybersecurity", image: "https://placehold.co/80x80/1E40AF/ffffff?text=Security" },
+];
+
+const Homepage = () => {
+  const navigate = useNavigate();
+  const { logout, getUserName } = useAuth(); // Use the auth context
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+  // Updated sign-out function that uses the auth context
+  const handleSignOut = async () => {
+    try {
+      setLoading(true);
+      setToast({ message: 'Signing out...', type: 'success' });
+      
+      console.log('Starting sign out process...');
+      
+      // Use the logout function from auth context
+      logout();
+      
+      console.log('Auth context logout completed');
+      
+      // Clear the toast
+      setToast({ message: '', type: '' });
+      setLoading(false);
+      
+      // Navigate to login page
+      navigate('/login', { replace: true });
+      
+      console.log('Navigation to login completed');
+      
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setLoading(false);
+      setToast({ message: 'Error signing out. Please try again.', type: 'error' });
+      
+      // Even if there's an error, try to navigate to login
+      setTimeout(() => {
+        navigate('/login', { replace: true });
+      }, 2000);
+    }
   };
 
-  const stats = [
-    { icon: Users, label: 'Active Developers', value: '10,000+' },
-    { icon: Briefcase, label: 'Jobs Posted', value: '5,000+' },
-    { icon: CheckCircle, label: 'Projects Completed', value: '3,000+' },
-    { icon: TrendingUp, label: 'Success Rate', value: '95%' }
-  ];
+  const handleBrowseJobsClick = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setMessage('Jobs page would load here in the full application!');
+    }, 2000);
+  };
 
-  const steps = [
-    {
-      number: '01',
-      title: 'Post Your Project',
-      description: 'Clients post detailed job descriptions with clear requirements and budgets.'
-    },
-    {
-      number: '02', 
-      title: 'Get Applications',
-      description: 'Skilled developers browse and apply for projects that match their expertise.'
-    },
-    {
-      number: '03',
-      title: 'Review & Hire',
-      description: 'Review applications, check portfolios, and hire the perfect developer for your project.'
-    }
-  ];
+  const closeMessageBox = () => setMessage(null);
+  const closeToast = () => setToast({ message: '', type: '' });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-900 min-h-screen text-gray-100 font-inter">
+      <Toast message={toast.message} type={toast.type} onClose={closeToast} />
+      <MessageBox message={message} onClose={closeMessageBox} />
+
+      {/* Navigation */}
+      <Navigation handleSignOut={handleSignOut} userName={getUserName()} />
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Welcome to <span className="text-yellow-400">SkillSwap</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              The premier platform where talented developers and visionary clients connect to build amazing digital experiences.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/jobs" 
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl"
-              >
-                Find Amazing Jobs
-              </Link>
-              <Link 
-                to="/register" 
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 font-semibold text-lg"
-              >
-                Post a Project
-              </Link>
+      <section className="pt-20 pb-24 bg-gradient-to-br from-gray-900 to-gray-800 text-center px-6">
+        <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight">
+          Connecting Elite Developers with Stellar Opportunities
+        </h2>
+        <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
+          DevConnect is your premier platform to discover top-tier development talent or secure your next groundbreaking project.
+        </p>
+        <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+          <button
+            onClick={handleBrowseJobsClick}
+            disabled={loading}
+            className={`bg-blue-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition duration-300 transform ${
+              loading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-blue-700 hover:scale-105'
+            } flex items-center justify-center`}
+          >
+            {loading && (
+              <svg className="animate-spin h-5 w-5 text-white mr-3" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {loading ? 'Loading Jobs...' : 'Browse Jobs'}
+          </button>
+          <button className="bg-transparent border-2 border-blue-600 text-blue-400 px-8 py-4 rounded-full font-bold hover:bg-blue-600 hover:text-white transition duration-300 shadow-lg transform hover:scale-105">
+            Post a Job
+          </button>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <h3 className="text-4xl font-extrabold text-center mb-16 text-white">Our Core Services</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {services.map((service, i) => (
+            <div key={i} className="bg-gray-800 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 flex flex-col items-center border border-gray-700">
+              <img src={service.image} alt={service.title} className="w-24 h-24 mx-auto mb-6 object-contain rounded-full border-4 border-blue-500 p-2 bg-gray-900" />
+              <h4 className="font-semibold text-gray-200 text-xl text-center">{service.title}</h4>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const IconComponent = stat.icon;
-              return (
-                <div key={index} className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                    <IconComponent className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                  <div className="text-gray-600">{stat.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">How SkillSwap Works</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Getting started is simple. Follow these three easy steps to connect with the perfect match for your project.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {steps.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full text-2xl font-bold mb-6">
-                  {step.number}
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">{step.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Jobs Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Opportunities</h2>
-              <p className="text-xl text-gray-600">
-                Discover high-quality projects from trusted clients
-              </p>
-            </div>
-            <Link 
-              to="/jobs"
-              className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold"
-            >
-              View All Jobs
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
-            {featuredJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                title={job.title}
-                budget={job.budget}
-                clientName={job.clientName}
-                status={job.status}
-                onClick={() => handleJobClick(job)}
-              />
-            ))}
-          </div>
-
-          {/* Mobile View All Button */}
-          <div className="text-center md:hidden">
-            <Link 
-              to="/jobs"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 font-semibold"
-            >
-              View All Jobs
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-purple-100 mb-8">
-            Join thousands of developers and clients who trust SkillSwap for their projects
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/register" 
-              className="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all duration-300 font-semibold text-lg"
-            >
-              Join as Developer
-            </Link>
-            <Link 
-              to="/register" 
-              className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-purple-600 transition-all duration-300 font-semibold text-lg"
-            >
-              Post Your Project
-            </Link>
-          </div>
+      <section className="bg-gray-800 text-white text-center py-20 px-6">
+        <h3 className="text-4xl font-extrabold mb-6">Ready to Connect?</h3>
+        <p className="text-lg mb-10 max-w-2xl mx-auto">
+          Join DevConnect today and elevate your career or find the perfect developer for your team.
+        </p>
+        <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+          <button className="bg-white text-blue-700 px-8 py-4 rounded-full font-bold shadow-lg hover:bg-gray-200 transition duration-300 transform hover:scale-105">
+            Get Started - It's Free!
+          </button>
+          <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-blue-700 transition duration-300 transform hover:scale-105">
+            Learn More
+          </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-700 text-sm text-gray-400 text-center py-8 px-6">
-        <p className="mb-4">© {new Date().getFullYear()} SkillSwap. All rights reserved.</p>
+      <footer className="bg-gray-900 text-sm text-gray-400 text-center py-8 px-6">
+        <p className="mb-4">© {new Date().getFullYear()} DevConnect. All rights reserved.</p>
         <div className="flex justify-center space-x-6 mt-2">
-          <Link to="/about" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</Link>
-          <Link to="/contact" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Contact Support</Link>
-          <Link to="/privacy" className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Privacy Policy</Link>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">About Us</button>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Contact Support</button>
+          <button className="hover:underline text-gray-400 hover:text-blue-300 transition duration-300">Privacy Policy</button>
         </div>
       </footer>
     </div>
   );
 };
 
-export default HomePage;
+export default Homepage;

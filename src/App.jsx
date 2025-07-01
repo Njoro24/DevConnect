@@ -4,16 +4,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './context/Authcontext';
 
-
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
-
-
-const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? children : <Navigate to="/" replace />;
-};
-
 
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
@@ -23,15 +15,17 @@ import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
-
-
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? children : <Navigate to="/" replace />;
+};
 
 function App() {
   return (
     <div className="App min-h-screen bg-gray-50">
       <Layout>
         <Routes>
-         
+          {/* Public Routes */}
           <Route
             path="/login"
             element={
@@ -49,7 +43,7 @@ function App() {
             }
           />
 
-        
+          {/* Protected Routes */}
           <Route
             path="/"
             element={
@@ -58,9 +52,8 @@ function App() {
               </PrivateRoute>
             }
           />
-          
-          <Route 
-            path="/profile/:userId" 
+          <Route
+            path="/profile/:userId"
             element={
               <PrivateRoute>
                 <ProfilePage />
@@ -92,17 +85,13 @@ function App() {
             }
           />
 
-         
-          <Route 
-            path="/home" 
-            element={<Navigate to="/" replace />} 
-          />
+          {/* Redirect /home to / */}
+          <Route path="/home" element={<Navigate to="/" replace />} />
 
-        
+          {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
-      
 
       <ToastContainer
         position="top-right"
