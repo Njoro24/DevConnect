@@ -39,11 +39,25 @@ export const AuthProvider = ({ children }) => {
       const savedToken = localStorage.getItem('devconnect_token');
       const savedUser = localStorage.getItem('devconnect_user');
 
+      console.log('Checking auth status...', { 
+        hasToken: !!savedToken, 
+        hasUser: !!savedUser 
+      });
+
       if (!savedToken || !savedUser) {
+        console.log('No saved credentials found');
         clearAuthData();
         return;
       }
 
+      // Validate token format
+      if (!savedToken.trim() || savedToken === 'null' || savedToken === 'undefined') {
+        console.log('Invalid token format');
+        clearAuthData();
+        return;
+      }
+
+      console.log('Verifying token with server...');
       const response = await fetch('/api/verify-token', {
         method: 'GET',
         headers: {
@@ -52,14 +66,40 @@ export const AuthProvider = ({ children }) => {
         }
       });
 
+      console.log('Token verification response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('Token verified successfully');
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
       } else {
+        console.log('Token verification failed:', response.status);
+        
+        // Handle different error scenarios
+        if (response.status === 401) {
+          console.log('Token expired or invalid');
+        } else if (response.status === 404) {
+          console.log('Verify endpoint not found');
+        } else {
+          console.log('Unexpected error during token verification');
+        }
+        
         clearAuthData();
       }
     } catch (error) {
       console.error('Auth check error:', error);
+      
+      // Network error or server unavailable
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        console.log('Network error - server may be unavailable');
+        // Optionally, you might want to retry or show a different message
+      }
+      
       clearAuthData();
     } finally {
       setIsLoading(false);
@@ -68,10 +108,19 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData, userToken) => {
     try {
+      // Validate inputs
+      if (!userData || !userToken) {
+        return { success: false, error: 'Invalid login data' };
+      }
+
+      console.log('Logging in user:', userData.email || userData.username);
+      
       setUser(userData);
       setToken(userToken);
       localStorage.setItem('devconnect_token', userToken);
       localStorage.setItem('devconnect_user', JSON.stringify(userData));
+      
+      console.log('Login successful');
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
@@ -81,6 +130,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
+      console.log('Attempting registration...');
+      
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,15 +145,18 @@ export const AuthProvider = ({ children }) => {
         data = rawText ? JSON.parse(rawText) : {};
       } catch (e) {
         console.error('Failed to parse JSON response:', e);
+        console.log('Raw response:', rawText);
       }
 
       if (!response.ok) {
+        console.log('Registration failed:', response.status, data.message);
         return {
           success: false,
           error: data.message || 'Registration failed'
         };
       }
 
+      console.log('Registration successful');
       await login(data.user, data.token);
       return { success: true, data };
     } catch (error) {
@@ -113,6 +167,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      console.log('Logging out...');
+      
       if (token) {
         await fetch('/api/logout', {
           method: 'POST',
@@ -122,6 +178,8 @@ export const AuthProvider = ({ children }) => {
           }
         });
       }
+      
+      console.log('Logout successful');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -130,6 +188,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUserData) => {
+    console.log('Updating user data');
     setUser(updatedUserData);
     localStorage.setItem('devconnect_user', JSON.stringify(updatedUserData));
   };
@@ -145,10 +204,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch(url, {
         ...options,
-        headers: getAuthHeaders()
+        headers: {
+          ...getAuthHeaders(),
+          ...options.headers
+        }
       });
 
       if (response.status === 401) {
+        console.log('API call received 401 - logging out');
         logout();
         throw new Error('Session expired');
       }

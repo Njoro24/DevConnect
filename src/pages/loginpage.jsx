@@ -4,8 +4,8 @@ import { useAuth } from '../context/Authcontext';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Github, Twitter, Linkedin, Link } from 'lucide-react';
 
 const LoginPage = () => {
-  const navigate = useNavigate(); // Replace the demo function
-  const { login } = useAuth();   // Replace the demo function
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -62,7 +62,7 @@ const LoginPage = () => {
       if (response.ok && data.user && data.access_token) {
         const result = await login(data.user, data.access_token);
         if (result.success) {
-          navigate('/');
+          navigate('/dashboard'); // Redirect to dashboard after login
         } else {
           setErrors({ general: 'Login failed. Please try again.' });
         }
@@ -107,9 +107,8 @@ const LoginPage = () => {
           <span className="text-2xl font-bold text-white">DevConnect</span>
         </div>
         <nav className="hidden md:flex items-center space-x-8 text-gray-300">
-          <a href="#" className="hover:text-white transition-colors">Jobs</a>
-          <a href="#" className="hover:text-white transition-colors">Job Details</a>
-          <a href="#" className="hover:text-white transition-colors">About</a>
+          <button onClick={() => navigate('/')} className="hover:text-white transition-colors">Home</button>
+          <button onClick={() => navigate('/about')} className="hover:text-white transition-colors">About</button>
         </nav>
       </header>
 

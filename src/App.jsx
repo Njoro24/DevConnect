@@ -4,16 +4,13 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './context/Authcontext';
 
-
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
-
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
-  return !isAuthenticated ? children : <Navigate to="/" replace />;
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
-
 
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
@@ -23,15 +20,14 @@ import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
-
-
-
 function App() {
   return (
     <div className="App min-h-screen bg-gray-50">
       <Layout>
         <Routes>
-         
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          
           <Route
             path="/login"
             element={
@@ -49,9 +45,9 @@ function App() {
             }
           />
 
-        
+          {/* Protected Routes */}
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <PrivateRoute>
                 <HomePage />
@@ -60,7 +56,7 @@ function App() {
           />
           
           <Route 
-            path="/profile/:userId" 
+            path="/profile/:userId"
             element={
               <PrivateRoute>
                 <ProfilePage />
@@ -92,18 +88,14 @@ function App() {
             }
           />
 
-         
-          <Route 
-            path="/home" 
-            element={<Navigate to="/" replace />} 
-          />
-
-        
+          {/* Redirects */}
+          <Route path="/home" element={<Navigate to="/" replace />} />
+          
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
       
-
       <ToastContainer
         position="top-right"
         autoClose={5000}
