@@ -4,11 +4,9 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './context/Authcontext';
 
-// Layout components
 import Layout from './components/layout/layout';
 import PrivateRoute from './components/common/PrivateRoute';
 
-// Page components
 import HomePage from './pages/homepage';
 import LoginPage from './pages/loginpage';
 import RegisterPage from './pages/registerpage';
@@ -17,7 +15,7 @@ import JobsPage from './pages/jobspage';
 import JobDetailsPage from './pages/jobdetailspage';
 import NotFound from './pages/Notfound';
 
-// Public route component
+// PublicRoute wrapper
 const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return !isAuthenticated ? children : <Navigate to="/" replace />;
@@ -88,14 +86,13 @@ function App() {
             }
           />
 
-          {/* Redirect /home to / */}
+          {/* Redirect root aliases */}
           <Route path="/home" element={<Navigate to="/" replace />} />
-
-          {/* Fallback 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
 
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}

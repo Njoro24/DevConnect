@@ -1,3 +1,4 @@
+@tailwind base;
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -83,5 +84,6 @@ code {
   transform: translateX(100%);
   transition: opacity 300ms, transform 300ms;
 }
+
 
 

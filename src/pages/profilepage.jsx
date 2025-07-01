@@ -1,78 +1,151 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../context/Authcontext';
+import PropTypes from 'prop-types';
 
-const mockProfiles = {
-  malik: {
-    name: 'Malik Dev',
-    role: 'Developer',
-    bio: 'Frontend dev who builds delightful UIs with React and Tailwind.',
-    skills: [
-      { name: 'React', level: 'Advanced' },
-      { name: 'JavaScript', level: 'Advanced' },
-      { name: 'Tailwind CSS', level: 'Intermediate' }
-    ],
-    appliedJobs: [
-      { title: 'Build DevConnect landing page', company: 'DevPro Labs' },
-      { title: 'Join remote React team', company: 'CodeSprint' }
-    ]
-  },
-  clientco: {
-    name: 'Client Co.',
-    role: 'Client',
-    bio: 'Startup hiring frontend and backend devs for rapid prototyping.',
-    postedJobs: [
-      { title: 'React dashboard build', status: 'Open' },
-      { title: 'Bug fixes in Django API', status: 'In Progress' }
-    ]
-  }
-};
+const DeveloperProfile = ({ skills, appliedJobs }) => (
+  <section aria-labelledby="skills-heading">
+    <h2 id="skills-heading" className="text-xl font-semibold mb-2">Skills</h2>
+    <ul role="list" className="mb-4 list-disc list-inside">
+      {skills.map(skill => (
+        <li key={skill.id}>
+          {skill.name} — <span className="text-sm text-gray-500">{skill.level}</span>
+        </li>
+      ))}
+    </ul>
+    <h2 id="jobs-heading" className="text-xl font-semibold mb-2">Applied Jobs</h2>
+    <ul role="list" className="list-disc list-inside">
+      {appliedJobs.map(job => (
+        <li key={job.id}>
+          <Link to={`/jobs/${job.id}`} className="hover:underline">
+            {job.title}
+          </Link> at <span className="font-medium">{job.company}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
 
-export default function ProfilePage() {
+const ClientProfile = ({ postedJobs }) => (
+  <section aria-labelledby="jobs-heading">
+    <h2 id="jobs-heading" className="text-xl font-semibold mb-2">Posted Jobs</h2>
+    <ul role="list" className="list-disc list-inside">
+      {postedJobs.map(job => (
+        <li key={job.id}>
+          <Link to={`/jobs/${job.id}`} className="hover:underline">
+            {job.title}
+          </Link> — <span className="text-sm text-green-600">{job.status}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
+
+const ProfilePage = () => {
   const { userId } = useParams();
-  const profile = mockProfiles[userId];
+  const { isAuthenticated } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!profile) return <p className="p-6 text-red-600">User not found</p>;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await authAPI.getProfile(userId);
+        setProfile(data);
+      } catch (err) {
+        setError(err.message || 'Failed to load profile');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (isAuthenticated) fetchProfile();
+  }, [userId, isAuthenticated]);
+
+  if (!isAuthenticated) return (
+    <p role="alert" className="p-6 text-red-600">
+      Please <Link to="/login" className="underline">log in</Link> to view profiles.
+    </p>
+  );
+  if (isLoading) return <p className="p-6 text-gray-600">Loading profile...</p>;
+  if (error) return <p role="alert" className="p-6 text-red-600">{error}</p>;
+  if (!profile) return (
+    <p role="alert" className="p-6 text-red-600">
+      Profile not found for user ID: {userId}
+    </p>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-10">
-      <h1 className="text-3xl font-bold text-blue-800 mb-2">{profile.name}</h1>
-      <p className="text-gray-600 italic mb-4">{profile.role}</p>
-      <p className="mb-6">{profile.bio}</p>
+    <main className="max-w-4xl mx-auto p-4 sm:p-6 bg-white rounded shadow mt-6 sm:mt-10" aria-labelledby="profile-title">
+      <h1 id="profile-title" className="text-2xl sm:text-3xl font-bold text-blue-800 mb-2">{profile.name}</h1>
+      <p className="text-sm sm:text-base text-gray-600 italic mb-4">{profile.role}</p>
+      <p className="text-sm sm:text-base mb-6">{profile.bio}</p>
 
       {profile.role === 'Developer' && (
-        <>
-          <h2 className="text-xl font-semibold mb-2">Skills</h2>
-          <ul className="mb-4 list-disc list-inside">
-            {profile.skills.map((skill, i) => (
-              <li key={i}>
-                {skill.name} — <span className="text-sm text-gray-500">{skill.level}</span>
-              </li>
-            ))}
-          </ul>
-
-          <h2 className="text-xl font-semibold mb-2">Applied Jobs</h2>
-          <ul className="list-disc list-inside">
-            {profile.appliedJobs.map((job, i) => (
-              <li key={i}>
-                {job.title} at <span className="font-medium">{job.company}</span>
-              </li>
-            ))}
-          </ul>
-        </>
+        <DeveloperProfile skills={profile.skills} appliedJobs={profile.appliedJobs} />
       )}
-
       {profile.role === 'Client' && (
-        <>
-          <h2 className="text-xl font-semibold mb-2">Posted Jobs</h2>
-          <ul className="list-disc list-inside">
-            {profile.postedJobs.map((job, i) => (
-              <li key={i}>
-                {job.title} — <span className="text-sm text-green-600">{job.status}</span>
-              </li>
-            ))}
-          </ul>
-        </>
+        <ClientProfile postedJobs={profile.postedJobs} />
       )}
-    </div>
+    </main>
   );
-}
+};
+
+DeveloperProfile.propTypes = {
+  skills: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      level: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  appliedJobs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      company: PropTypes.string.isRequired
+    })
+  ).isRequired
+};
+
+ClientProfile.propTypes = {
+  postedJobs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired
+    })
+  ).isRequired
+};
+
+ProfilePage.propTypes = {
+  profile: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    role: PropTypes.oneOf(['Developer', 'Client']).isRequired,
+    bio: PropTypes.string.isRequired,
+    skills: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        level: PropTypes.string.isRequired
+      })
+    ),
+    appliedJobs: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        company: PropTypes.string.isRequired
+      })
+    ),
+    postedJobs: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        status: PropTypes.string.isRequired
+      })
+    )
+  })
+};
+
+export default ProfilePage;
